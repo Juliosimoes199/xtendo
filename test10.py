@@ -9,30 +9,32 @@ import threading
 
 genai.configure(api_key="AIzaSyArTog-quWD9Tqf-CkkFAq_-UOZfK1FTtA")
 
-st.set_page_config(page_title="Xtendo Ai - Seu Assistente Virtual", page_icon="🤖")
+st.set_page_config(page_title="Deloitte Angola AI - Seu Assistente Virtual", page_icon="📈")
 
-# --- Dados Fictícios da Xtendo Group (Integrados) ---
-xtendo_info = {
-    "nome_empresa": "Xtendo Group",
+# --- Informações da Deloitte Angola (Integradas) ---
+deloitte_info = {
+    "nome_empresa": "Deloitte Angola",
     "localizacao": "Luanda, Angola",
-    "delivery_horario": "10h às 23h todos os dias",
-    "delivery_area": "toda a cidade de Luanda e arredores",
-    "delivery_taxa": "500 AOA (pode variar)",
-    "pagamentos_delivery": "Transferência bancária, Multicaixa e pagamento na entrega (dinheiro)",
-    "rastreamento_pedido": "Link enviado por SMS ou e-mail",
-    "suporte_delivery": "Chat ou telefone +244 9XXXXXXX",
-    "restaurantes_parceiros": ["Sabor Angolano", "Pizza Place", "Delícias do Mar"],
-    "ecommerce_produtos": "eletrônicos, moda e itens para casa",
-    "ecommerce_frete_luanda": "Padrão (3-5 dias úteis), Expresso (1-2 dias úteis)",
-    "ecommerce_troca_devolucao": "7 dias após o recebimento (produto original)",
-    "ecommerce_pagamentos": "Multicaixa, transferência bancária e cartões de crédito internacionais",
-    "ecommerce_suporte": "suporte@xtendogroup.ao ou chat online",
-    "logistica_servicos": "transporte de pequenas e médias cargas em Luanda e algumas rotas intermunicipais",
-    "logistica_prazo_luanda": "1-2 dias úteis",
-    "logistica_contato": "Formulário online ou telefone",
-    "telefone_geral": "+244 9XXXXXXX",
-    "endereco_fisico": "Rua da República, nº 123, Luanda",
-    "site": "www.xtendogroup.ao"
+    "endereco_fisico": "Condomínio Cidade Financeira, Via S8, Bloco 4 - 5º, Talatona, Luanda, Angola",
+    "telefone_geral": "+244 923 xxx xxx", # Telefone encontrado online
+    "site": "https://www.deloitte.com/africa-lusofona/pt.html", # Site da Deloitte África Lusófona, que inclui Angola
+    "servicos_principais": [
+        "Auditoria e Asseguração",
+        "Consultoria (Gestão, Estratégia, Tecnologia)",
+        "Consultoria Fiscal e Jurídica",
+        "Risk Advisory (Gestão de Risco)",
+        "Financial Advisory (Consultoria Financeira)",
+        "Serviços de Outsourcing (BPS - Business Process Solutions, RH e Payroll)",
+        "Serviços de Cibersegurança (Cyber Defense & Resilience, Cyber Operate, Cyber Strategy & Transformation, Digital Trust & Privacy, Enterprise Security)",
+        "Inteligência Artificial Generativa (através do Centro de Excelência em IA Generativa)",
+        "Assessoria em Transações e Reestruturações",
+        "Serviços para Setor Público",
+        "Serviços para Indústria de Energia, Recursos e Manufatura",
+        "Serviços para Setor Financeiro"
+    ],
+    "foco_mercado": "Grandes empresas, grupos económicos, instituições públicas e privadas em Angola",
+    "recrutamento_foco": "Profissionais com formação superior em Economia, Gestão, Contabilidade e Fiscalidade.",
+    "projetos_sociais": "PACT Fund (apoia projetos sociais em Angola nas áreas de educação, empregabilidade, empreendedorismo e sustentabilidade ambiental)."
 }
 
 @st.cache_resource
@@ -44,32 +46,34 @@ def initialize_metrics():
 
 REQUEST_COUNT, RESPONSE_LATENCY, AGENT_INTERACTION_COUNT = initialize_metrics()
 
-def agente_de_vendas_xtendo(pergunta_usuario, historico_conversa, xtendo_conhecimento=xtendo_info):
+def agente_deloitte(pergunta_usuario, historico_conversa, deloitte_conhecimento=deloitte_info):
     """
-    Agente para responder perguntas sobre a Xtendo Group, lembrando do histórico da conversa.
+    Agente para responder perguntas sobre a Deloitte Angola, lembrando do histórico da conversa.
     """
     start_time = time.time()
-    model_vendas = genai.GenerativeModel('gemini-2.0-flash-exp')
+    model_deloitte = genai.GenerativeModel('gemini-2.0-flash-exp')
 
-    prompt_xtendo = f"""Você é um agente de atendimento ao cliente da {xtendo_conhecimento['nome_empresa']} em {xtendo_conhecimento['localizacao']}. Você deve responder perguntas com base nas seguintes informações:\n\n"""
-    prompt_xtendo += f"- **Delivery:** Atendemos em {xtendo_conhecimento['delivery_area']}, das {xtendo_conhecimento['delivery_horario']}. Taxa de entrega: {xtendo_conhecimento['delivery_taxa']}. Pagamentos: {xtendo_conhecimento['pagamentos_delivery']}. Rastreamento: {xtendo_conhecimento['rastreamento_pedido']}. Suporte: {xtendo_conhecimento['suporte_delivery']}. Restaurantes parceiros: {', '.join(xtendo_conhecimento['restaurantes_parceiros'])}.\n"
-    prompt_xtendo += f"- **E-commerce:** Vendemos {xtendo_conhecimento['ecommerce_produtos']}. Frete em Luanda: {xtendo_conhecimento['ecommerce_frete_luanda']}. Troca/Devolução: {xtendo_conhecimento['ecommerce_troca_devolucao']}. Pagamentos: {xtendo_conhecimento['ecommerce_pagamentos']}. Suporte: {xtendo_conhecimento['ecommerce_suporte']}.\n"
-    prompt_xtendo += f"- **Logística:** Oferecemos {xtendo_conhecimento['logistica_servicos']}. Prazo em Luanda: {xtendo_conhecimento['logistica_prazo_luanda']}. Contato para orçamento: {xtendo_conhecimento['logistica_contato']}.\n"
-    prompt_xtendo += f"- **Informações Gerais:** Telefone: {xtendo_conhecimento['telefone_geral']}. Endereço: {xtendo_conhecimento['endereco_fisico']}. Site: {xtendo_conhecimento['site']}.\n"
-    prompt_xtendo += "Seu nome é Xtendo Ai. Seja amigável e profissional."
+    prompt_deloitte = f"""Você é um agente de atendimento ao cliente da {deloitte_conhecimento['nome_empresa']} em {deloitte_conhecimento['localizacao']}. Você deve responder perguntas com base nas seguintes informações:\n\n"""
+    prompt_deloitte += f"- **Sobre a Deloitte Angola:** Somos uma das maiores empresas de serviços profissionais do mundo, com uma forte presença em Angola. Nosso endereço é {deloitte_conhecimento['endereco_fisico']} e nosso telefone geral é {deloitte_conhecimento['telefone_geral']}. Você pode encontrar mais informações em nosso site: {deloitte_conhecimento['site']}.\n"
+    prompt_deloitte += f"- **Nossos Serviços Principais:** Oferecemos uma ampla gama de serviços para grandes empresas, grupos económicos e instituições públicas e privadas. Nossos serviços incluem: {', '.join(deloitte_conhecimento['servicos_principais'])}.\n"
+    prompt_deloitte += f"- **Foco no Mercado:** A Deloitte Angola colabora com os principais grupos económicos e empresas angolanas em diversos projetos estratégicos e operacionais.\n"
+    prompt_deloitte += f"- **Inovação e Tecnologia:** Recentemente, lançamos um Centro de Excelência em Inteligência Artificial Generativa no ANGOTIC 2025 para impulsionar a transformação digital e desenvolver soluções baseadas em IA.\n"
+    prompt_deloitte += f"- **Recrutamento:** Buscamos constantemente talentos, especialmente jovens com formação superior em Economia, Gestão, Contabilidade e Fiscalidade, com ambição e capacidade de trabalhar em equipa.\n"
+    prompt_deloitte += f"- **Responsabilidade Social:** Através do nosso PACT Fund, apoiamos projetos sociais em Angola, com foco em educação, empregabilidade, empreendedorismo e sustentabilidade ambiental.\n"
+    prompt_deloitte += "Seu nome é Deloitte AI. Seja amigável, profissional e utilize um tom formal e informativo, adequado a uma empresa de consultoria e auditoria de grande porte."
 
     # Adiciona o histórico da conversa ao prompt
-    prompt_xtendo += "\nHistórico da Conversa:\n"
+    prompt_deloitte += "\nHistórico da Conversa:\n"
     for turno in historico_conversa:
-        prompt_xtendo += f"{'Usuário' if turno['is_user'] else 'Xtendo Ai'}: {turno['content']}\n"
+        prompt_deloitte += f"{'Usuário' if turno['is_user'] else 'Deloitte AI'}: {turno['content']}\n"
 
-    prompt_xtendo += f"""\nCom base nas informações acima e no histórico da conversa, responda à seguinte pergunta do usuário da melhor forma possível:\n\n"{pergunta_usuario}"\n\nSe a pergunta for feita em português, responda somente em português. Se for em inglês, responda em inglês. Tente lembrar de informações ditas anteriormente na conversa para fornecer respostas mais contextuais, evita dizer sempre 'Olá' diga somente uma vez, e das outras vezes comece com outras frases que se adpta a pergunta do usuário."""
+    prompt_deloitte += f"""\nCom base nas informações acima e no histórico da conversa, responda à seguinte pergunta do usuário da melhor forma possível:\n\n"{pergunta_usuario}"\n\nSe a pergunta for feita em português, responda somente em português. Se for em inglês, responda em inglês. Tente lembrar de informações ditas anteriormente na conversa para fornecer respostas mais contextuais, evita dizer sempre 'Olá' diga somente uma vez, e das outras vezes comece com outras frases que se adpta a pergunta do usuário."""
 
-    response_xtendo = model_vendas.generate_content(prompt_xtendo)
+    response_deloitte = model_deloitte.generate_content(prompt_deloitte)
     latency = time.time() - start_time
     RESPONSE_LATENCY.observe(latency)
     AGENT_INTERACTION_COUNT.inc()
-    return response_xtendo.text
+    return response_deloitte.text
 
 # --- Interface Streamlit Aprimorada e Mais Atraente com Memória ---
 st.markdown(
@@ -147,8 +151,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("Xtendo AI - Seu Assistente Virtual 🤖")
-st.markdown("Olá! 👋 Como posso te ajudar hoje?")
+st.title("Deloitte AI - Seu Assistente Virtual 📈")
+st.markdown("Olá! 👋 Como posso te ajudar hoje com informações sobre a Deloitte Angola?")
 
 # Inicializa o histórico de mensagens
 if "messages" not in st.session_state:
@@ -168,33 +172,29 @@ if prompt := st.chat_input("Digite sua pergunta aqui..."):
     st.markdown(f'<div class="user-message"><i class="fa fa-user-circle"></i> {prompt}</div>', unsafe_allow_html=True)
 
     # Obtém a resposta do agente, passando o histórico da conversa
-    resposta_do_agente = agente_de_vendas_xtendo(prompt, st.session_state["messages"])
+    resposta_do_agente = agente_deloitte(prompt, st.session_state["messages"])
     st.session_state["messages"].append({"content": resposta_do_agente, "is_user": False})
     st.markdown(f'<div class="agent-message"><i class="fa fa-robot"></i> {resposta_do_agente}</div>', unsafe_allow_html=True)
 
 # Barra Lateral com visual aprimorado
 with st.sidebar:
-    st.header("Informações Xtendo Group")
+    st.header("Informações Deloitte Angola")
     with st.expander("**Sobre Nós**", expanded=False):
-        st.markdown(f"<p class='sidebar-item'>Localização: {xtendo_info['localizacao']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Telefone: {xtendo_info['telefone_geral']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Site: <a href='{xtendo_info['site']}' target='_blank'>{xtendo_info['site']}</a></p>", unsafe_allow_html=True)
-    with st.expander("**Delivery**", expanded=False):
-        st.markdown(f"<p class='sidebar-item'>Horário: {xtendo_info['delivery_horario']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Área de Cobertura: {xtendo_info['delivery_area']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Taxa de Entrega: {xtendo_info['delivery_taxa']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Pagamentos: {xtendo_info['pagamentos_delivery']}</p>", unsafe_allow_html=True)
-    with st.expander("**E-commerce**", expanded=False):
-        st.markdown(f"<p class='sidebar-item'>Produtos: {xtendo_info['ecommerce_produtos']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Frete (Luanda): {xtendo_info['ecommerce_frete_luanda']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Troca/Devolução: {xtendo_info['ecommerce_troca_devolucao']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Pagamentos: {xtendo_info['ecommerce_pagamentos']}</p>", unsafe_allow_html=True)
-    with st.expander("**Logística**", expanded=False):
-        st.markdown(f"<p class='sidebar-item'>Serviços: {xtendo_info['logistica_servicos']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Prazo (Luanda): {xtendo_info['logistica_prazo_luanda']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p class='sidebar-item'>Contato: {xtendo_info['logistica_contato']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p class='sidebar-item'>Localização: {deloitte_info['localizacao']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p class='sidebar-item'>Endereço: {deloitte_info['endereco_fisico']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p class='sidebar-item'>Telefone: {deloitte_info['telefone_geral']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p class='sidebar-item'>Site: <a href='{deloitte_info['site']}' target='_blank'>{deloitte_info['site']}</a></p>", unsafe_allow_html=True)
+    with st.expander("**Serviços**", expanded=False):
+        for service in deloitte_info['servicos_principais']:
+            st.markdown(f"<p class='sidebar-item'>- {service}</p>", unsafe_allow_html=True)
+    with st.expander("**Foco e Recrutamento**", expanded=False):
+        st.markdown(f"<p class='sidebar-item'>Foco de Mercado: {deloitte_info['foco_mercado']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p class='sidebar-item'>Recrutamento: {deloitte_info['recrutamento_foco']}</p>", unsafe_allow_html=True)
+    with st.expander("**Inovação e Responsabilidade Social**", expanded=False):
+        st.markdown(f"<p class='sidebar-item'>Inovação: Centro de Excelência em IA Generativa</p>", unsafe_allow_html=True)
+        st.markdown(f"<p class='sidebar-item'>Projetos Sociais: {deloitte_info['projetos_sociais']}</p>", unsafe_allow_html=True)
     st.markdown("---")
-    st.markdown("Xtendo Group Mais Perto De Si🤝")
+    st.markdown("Deloitte Angola: Impactando o que importa.")
 
 # Adiciona a biblioteca Font Awesome para os ícones
 components.html(
